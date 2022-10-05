@@ -5,7 +5,7 @@ import re
 import boto3
 
 import tweepy
-from tweepy import TweepError
+from tweepy.errors import TweepyException
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -126,7 +126,7 @@ def set_icon_image(api, bucket_name, new_icon):
             Bucket=bucket_name, Key=get_icon_indicator(bucket_name))
         s3client.copy_object(Bucket=bucket_name, Key='0_' + new_icon,
                              CopySource={'Bucket': bucket_name, 'Key': new_icon})
-    except TweepError:
+    except TweepyException:
         logger.error(
             'There was a problem when invoking Twitter API', exc_info=True)
 
@@ -146,9 +146,9 @@ def update_bio(api, author):
     '''
 
     try:
-        user = api.me()
+        user = api.verify_credentials()
         bio = user.description
-    except TweepError:
+    except TweepyException:
         logger.error(
             'There was a problem when invoking Twitter API', exc_info=True)
 
@@ -173,7 +173,7 @@ def update_bio(api, author):
             'successfully updated description. new_bio: {}'.format(new_bio))
         return new_bio
 
-    except TweepError as e:
+    except TweepyException as e:
         logger.error(
             'There was a problem when invoking Twitter API', exc_info=True)
 

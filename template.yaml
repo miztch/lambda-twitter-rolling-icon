@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: twitter-rolling-icon
+
+Parameters:
+  ScheduleExpression:
+    Description: schedule expression for the eventbridge event
+    Type: String
+    Default: rate(3 hours)
+  ImageBucketName:
+    Description: s3 bucket stores images for your twitter icon
+    Type: String
+  ImageBucketObjectPrefix:
+    Type: String
+    Default: /
+  TwitterAccessSecret:
+    Type: String
+  TwitterAccessToken:
+    Type: String
+  TwitterConsumerKey:
+    Type: String
+  TwitterConsumerSecret:
+    Type: String
+
+Resources:
+  TweepyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: tweepy
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+  RollingIconFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function/
+      Description: ""
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - AmazonS3FullAccess
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref ImageBucketName
+          OBJECT_PREFIX: !Ref ImageBucketObjectPrefix
+          TWITTER_ACCESS_SECRET: !Ref TwitterAccessSecret
+          TWITTER_ACCESS_TOKEN: !Ref TwitterAccessToken
+          TWITTER_CONSUMER_KEY: !Ref TwitterConsumerKey
+          TWITTER_CONSUMER_SECRET: !Ref TwitterConsumerSecret
+      Layers:
+        - !Ref TweepyLayer
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref ScheduleExpression

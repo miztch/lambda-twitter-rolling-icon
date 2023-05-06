@@ -1,5 +1,13 @@
 # lambda-twitter-rolling-icon
 
+> **Warning** **This repository now goes to public archive.** (May 6, 2023)
+>
+> Due to recent changes on Twitter API policy, applications using API v1.1 has been suspended.
+>
+> Also, APIv2 does not have endpoint managing user bio, which is indispensable for this repository.
+>
+> Based on this situation, no more updates are available.
+
 A simple Lambda Function
 - changes your Twitter profile image (and description) at a fixed interval
 - this interval is defined in schedule expression of EventBridge Event
